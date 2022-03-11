@@ -16,8 +16,10 @@ using namespace std;
 
 inforsubstr::inforsubstr(size_t _first, size_t _last, string _data):first(_first), last(_last), data(_data) {}
 
+
 StreamReassembler::StreamReassembler(const size_t capacity):private_unassembled_bytes(0),  storelist({}),
  firstindex(0), _output(capacity), _capacity(capacity) {}
+
 
 //! \details This function accepts a substring (aka a segment) of bytes,
 //! possibly out-of-order, from the logical stream, and assembles any newly
@@ -26,7 +28,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
 {
 
     checkeof = eof == true ? eof : checkeof;
-    if (data.size() == 0)
+    if (!data.size()) 
     {
         if (checkeof && firstindex == index) // 마지막 
             _output.end_input();
@@ -42,41 +44,37 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         return;
 
 
-    list<inforsubstr>::iterator it;
-
+    list<inforsubstr>::iterator iter;
     bool is_inserted = false;
 
 
-    for (it = storelist.begin(); it != storelist.end(); it++)
-    {
+    for (iter =storelist.begin(); iter != storelist.end(); iter++){
 
-        auto temp = *it;
+        auto temp = *iter;
 
-        if (temp.first + temp.data.size() < sub_begin)
-            continue; //순서대로 넣기 위해 자리를 찾는 과정
+        if (temp.first + temp.data.size() < sub_begin) continue; //순서대로 넣기 위해 자리를 찾는 과정
 
         if (sub_end + 1 < temp.first)
-        { // 자신이 들어갈 자리 발견
+        { // 자신이 들어갈 자리 발견하면 insert 하고 끝내기
                 is_inserted = true;
                 inforsubstr inserttemp(sub_begin, sub_end, sub_string);
-                storelist.insert(it, inserttemp);
+                storelist.insert(iter, inserttemp);
                 private_unassembled_bytes += sub_string.size();
-
                 break;   
         }
         else
         { // overlap -> 합집합을 storelist에 저장해준다.
 
-            list<inforsubstr>::iterator temp2 = it;
-            it++;
+            list<inforsubstr>::iterator temp2 = iter;
+            iter++;
             private_unassembled_bytes -= temp.data.size();
             storelist.erase(temp2);
 
             if (temp.first <= sub_begin && temp.last >= sub_end) //안에 있을 때
             {
+                sub_string = temp.data;
                 sub_begin = temp.first;
                 sub_end = temp.last;
-                sub_string = temp.data;
             }
             else if (temp.first <= sub_begin && temp.last <= sub_end) // temp.first sub.begin temp.last sub.end 순
             {
@@ -90,9 +88,10 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
                 sub_end = temp.last;
                 // sub begin은 그대로
             }
-            it--;
+            iter--;
         }
     }
+
 
     if (!is_inserted)
     { // overlap 처리한 거 insert
@@ -112,12 +111,12 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         private_unassembled_bytes += storelist.front().data.size();
 
     }
-    if (storelist.back().last + 1 >= _capacity + firstindex)
+    if (storelist.back().last + 1 >= firstindex + _capacity)
     { // 맨 뒤일 경우
         private_unassembled_bytes -= storelist.back().data.size();
 
-        storelist.back().data = storelist.back().data.substr(0, _capacity + firstindex - storelist.back().first);
-        storelist.back().last = _capacity + firstindex - 1;
+        storelist.back().data = storelist.back().data.substr(0, firstindex + _capacity - storelist.back().first);
+        storelist.back().last = firstindex + _capacity - 1;
 
         private_unassembled_bytes += storelist.back().data.size();
 
@@ -139,6 +138,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         { // capacity 부족 하지 않을 경우
             send = storelist.front().data;
             firstindex = storelist.front().last + 1;
+            
             storelist.pop_front();
         }
 
@@ -150,6 +150,9 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     }
 }
 
-size_t StreamReassembler::unassembled_bytes() const { return private_unassembled_bytes; }
 
-bool StreamReassembler::empty() const { return storelist.size() == 0; }
+size_t StreamReassembler::unassembled_bytes() const {
+     return private_unassembled_bytes;  }
+
+bool StreamReassembler::empty() const { 
+    return storelist.size() == 0 && unassembled_bytes() == 0;   }

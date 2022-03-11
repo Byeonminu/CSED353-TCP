@@ -8,8 +8,9 @@
 //! Bytes are written on the "input" side and read from the "output"
 //! side.  The byte stream is finite: the writer can end the input,
 //! and then no more bytes can be written.
-class ByteStream {
-  private:
+class ByteStream
+{
+private:
     // Your code here -- add private members as necessary.
 
     // Hint: This doesn't need to be a sophisticated data structure at
@@ -17,9 +18,14 @@ class ByteStream {
     // that's a sign that you probably want to keep exploring
     // different approaches.
 
-    bool _error{};  //!< Flag indicating that the stream suffered an error.
+    bool _error = false; //!< Flag indicating that the stream suffered an error.
+    bool end = false;
+    std::string content = "";
 
-  public:
+    size_t alread = 0, alwritten = 0;
+    size_t max = 0;
+
+public:
     //! Construct a stream with room for `capacity` bytes.
     ByteStream(const size_t capacity);
 
@@ -82,4 +88,4 @@ class ByteStream {
     //!@}
 };
 
-#endif  // SPONGE_LIBSPONGE_BYTE_STREAM_HH
+#endif // SPONGE_LIBSPONGE_BYTE_STREAM_HH

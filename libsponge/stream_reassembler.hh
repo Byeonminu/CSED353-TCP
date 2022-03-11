@@ -5,15 +5,36 @@
 
 #include <cstdint>
 #include <string>
+#include <list>
+
+using namespace std;
+
+class inforsubstr {
+
+    public:
+    size_t first;
+    size_t last;
+    string data;
+    inforsubstr(size_t _first, size_t _last, std::string _data);
+};
 
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
 //! possibly overlapping) into an in-order byte stream.
 class StreamReassembler {
   private:
     // Your code here -- add private members as necessary.
+     size_t private_unassembled_bytes;
+     bool checkeof = false;
+     list<inforsubstr> storelist;
+     size_t firstindex;
 
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
+    
+  
+   
+   
+    
 
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.

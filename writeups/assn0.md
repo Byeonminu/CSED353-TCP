@@ -1,20 +1,20 @@
 Assignment 0 Writeup
 =============
 
-My name: [your name here]
+My name: [Byeon minwoo]
 
-My POVIS ID: [your povis id here]
+My POVIS ID: [minwoobyeon]
 
-My student ID (numeric): [your student id here]
+My student ID (numeric): [20200820]
 
-This assignment took me about [n] hours to do (including the time on studying, designing, and writing the code).
+This assignment took me about [10] hours to do (including the time on studying, designing, and writing the code).
 
-My secret code from section 2.1 was: [code here]
+My secret code from section 2.1 was: [0855cd88f2]
 
-- Optional: I had unexpected difficulty with: [describe]
+- Optional: I had unexpected difficulty with: [handling virtual machine and linux]
 
-- Optional: I think you could make this lab better by: [describe]
+- Optional: I think you could make this lab better by: [studying linux]
 
-- Optional: I was surprised by: [describe]
+- Optional: I was surprised by: [connection two terminal window using 'netcat' and 'telnet']
 
-- Optional: I'm not sure about: [describe]
+- Optional: I'm not sure about: [well.. nothing?]

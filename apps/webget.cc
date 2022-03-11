@@ -17,8 +17,22 @@ void get_URL(const string &host, const string &path) {
     // (not just one call to read() -- everything) until you reach
     // the "eof" (end of file).
 
-    cerr << "Function called: get_URL(" << host << ", " << path << ").\n";
-    cerr << "Warning: get_URL() has not been implemented yet.\n";
+    // connect to the "http" service on
+    Address address(host, "http");
+    TCPSocket tcpsoc;
+
+    tcpsoc.connect(address);
+    tcpsoc.write("GET " + path + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" );
+    tcpsoc.write("Connection: close\r\n\r\n");
+    while (!tcpsoc.eof()) 
+        cout << tcpsoc.read();
+    
+    tcpsoc.shutdown(SHUT_WR); // send buffer 만 차단한다 (더 이상 socket에게 송신할 수 없다)
+
+
+
+    // cerr << "Function called: get_URL(" << host << ", " << path << ").\n";
+    // cerr << "Warning: get_URL() has not been implemented yet.\n";
 }
 
 int main(int argc, char *argv[]) {

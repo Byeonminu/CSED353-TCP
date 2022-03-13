@@ -31,9 +31,10 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     if (!data.size()) 
     {
         if (checkeof && firstindex == index) // 마지막 
-            _output.end_input();
+             _output.end_input();
 
-        return;
+          return; // 필수
+           
     }
 
     size_t sub_begin = index;                     // substring 시작 index
@@ -48,7 +49,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     bool is_inserted = false;
 
 
-    for (iter =storelist.begin(); iter != storelist.end(); iter++){
+    for (iter =storelist.begin(); iter != storelist.end(); iter++){ // first index가 낮은 순으로 list에 insert
 
         auto temp = *iter;
 
@@ -59,7 +60,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
                 is_inserted = true;
                 inforsubstr inserttemp(sub_begin, sub_end, sub_string);
                 storelist.insert(iter, inserttemp);
-                private_unassembled_bytes += sub_string.size();
+                private_unassembled_bytes += sub_string.size(); // 아직 정렬 안된 bytes들
                 break;   
         }
         else
@@ -93,7 +94,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     }
 
 
-    if (!is_inserted)
+    if (!is_inserted) //위에서 overlap이 되었을 경우
     { // overlap 처리한 거 insert
         inforsubstr temp(sub_begin, sub_end, sub_string);
         storelist.push_back(temp);

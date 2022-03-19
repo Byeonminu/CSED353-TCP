@@ -5,7 +5,7 @@ My name: [Byeon minwoo]
 
 My POVIS ID: [minwoobyeon]
 
-My student IByeon minwoo(numeric): [20200820]
+My student ID (numeric): [20200820]
 
 This assignment took me about [12] hours to do (including the time on studying, designing, and writing the code).
 

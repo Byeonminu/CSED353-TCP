@@ -14,8 +14,11 @@ using namespace std;
 //! \param n The input absolute 64-bit sequence number
 //! \param isn The initial sequence number
 WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) {
-    DUMMY_CODE(n, isn);
-    return WrappingInt32{0};
+    //absolute seqno -> seqno
+    uint64_t temp= n + isn.raw_value();
+    //temp = temp % (pow(2,32)-1);
+    WrappingInt32 ret((uint32_t(temp)));
+    return ret;
 }
 
 //! Transform a WrappingInt32 into an "absolute" 64-bit sequence number (zero-indexed)
@@ -29,6 +32,20 @@ WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) {
 //! and the other stream runs from the remote TCPSender to the local TCPReceiver and
 //! has a different ISN.
 uint64_t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64_t checkpoint) {
-    DUMMY_CODE(n, isn, checkpoint);
-    return {};
+    // Convert seqno -> absolute seqno
+    WrappingInt32 sqenocheck = wrap(checkpoint, isn); // absolute seqno인 checkpoint를 seqno로 바꾼다
+
+    uint64_t difference1 = n.raw_value() - sqenocheck.raw_value();
+    uint64_t difference2 = sqenocheck.raw_value() - n.raw_value();
+    
+    if (difference1 > difference2)
+    {
+        if(checkpoint >= difference2) return checkpoint - difference2;
+        else return checkpoint + difference1;
+       
+    }
+    
+      return checkpoint + difference1;
+        
+   
 }

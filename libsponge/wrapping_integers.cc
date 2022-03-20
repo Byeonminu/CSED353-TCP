@@ -4,7 +4,7 @@
 
 // For Lab 2, please replace with a real implementation that passes the
 // automated checks run by `make check_lab2`.
-
+#include <cmath>
 template <typename... Targs>
 void DUMMY_CODE(Targs &&... /* unused */) {}
 
@@ -15,8 +15,8 @@ using namespace std;
 //! \param isn The initial sequence number
 WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) {
     //absolute seqno -> seqno
-    uint64_t temp= n + isn.raw_value();
-    //temp = temp % (pow(2,32)-1);
+    uint64_t temp = n + isn.raw_value();
+    temp = temp % static_cast<uint64_t>(pow(2,32));
     WrappingInt32 ret((uint32_t(temp)));
     return ret;
 }

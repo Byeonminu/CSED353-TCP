@@ -34,7 +34,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
         // absolute seqno -1
         if (!header.syn) abs_n--;
         
-
+         _reassembler.push_substring(seg.payload().copy(), abs_n, header.fin);
        
         uint64_t seg_begin = unwrap(header.seqno, _isn, _checkpoint);
         uint64_t seg_end = seg_begin + seg.length_in_sequence_space() - 1;
@@ -49,9 +49,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
         if(win_begin >= seg_end || seg_begin >= win_end) inside = false;
         else inside = true;
 
-     
-        _reassembler.push_substring(seg.payload().copy(), abs_n, header.fin);
-
+    
         if(header.fin && !_finset) _finset = true;
         
         return inside;

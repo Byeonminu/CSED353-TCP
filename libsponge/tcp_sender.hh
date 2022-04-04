@@ -9,19 +9,65 @@
 #include <functional>
 #include <queue>
 
+using namespace std;
 //! \brief The "sender" part of a TCP implementation.
 
 //! Accepts a ByteStream, divides it up into segments and sends the
 //! segments, keeps track of which segments are still in-flight,
 //! maintains the Retransmission Timer, and retransmits in-flight
 //! segments if the retransmission timer expires.
+
+class Timer {
+  private:
+    bool is_active;
+
+    
+    size_t setzero_rto;
+    size_t current_rto;
+    size_t current_time;
+   
+    
+  public:
+    Timer(size_t initial_value):
+    is_active(false),
+    setzero_rto(initial_value), 
+    current_rto(initial_value), 
+    current_time(0) {}
+
+    bool tick(size_t time){
+      if (!timer_active()) return false;
+      if (time >= current_rto - current_time) return true;
+      else {
+          current_time += time;
+          return false;
+       }
+    }
+
+    bool timer_active(){ return is_active;}
+
+    void begin(){
+        is_active = true;
+        current_time = 0;
+    }
+    void end(){
+        is_active = false;
+        current_time = 0;
+    }
+    void rto_double(){ current_rto = 2 * current_rto; }
+    void rto_reset(){ current_rto = setzero_rto; }
+
+  
+
+};
+
+
 class TCPSender {
   private:
     //! our initial sequence number, the number for our SYN.
     WrappingInt32 _isn;
 
     //! outbound queue of segments that the TCPSender wants sent
-    std::queue<TCPSegment> _segments_out{};
+    queue<TCPSegment> _segments_out{};
 
     //! retransmission timer for the connection
     unsigned int _initial_retransmission_timeout;
@@ -32,6 +78,17 @@ class TCPSender {
     //! the (absolute) sequence number for the next byte to be sent
     uint64_t _next_seqno{0};
 
+    bool check_syn{false};
+    bool check_fin{false};
+
+    queue<TCPSegment> unacked{};
+    Timer sendtimer;
+
+    uint16_t win_sizeof_sender{1};
+    size_t _consecutive_retransmissions_v{0};
+    uint64_t bytes_in_flight_v{0};
+   
+    
   public:
     //! Initialize a TCPSender
     TCPSender(const size_t capacity = TCPConfig::DEFAULT_CAPACITY,
@@ -48,7 +105,7 @@ class TCPSender {
     //!@{
 
     //! \brief A new acknowledgment was received
-    void ack_received(const WrappingInt32 ackno, const uint16_t window_size);
+    bool ack_received(const WrappingInt32 ackno, const uint16_t window_size);
 
     //! \brief Generate an empty-payload segment (useful for creating empty ACK segments)
     void send_empty_segment();
@@ -57,7 +114,7 @@ class TCPSender {
     void fill_window();
 
     //! \brief Notifies the TCPSender of the passage of time
-    void tick(const size_t ms_since_last_tick);
+    void tick(const size_t time);
     //!@}
 
     //! \name Accessors

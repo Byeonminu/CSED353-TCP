@@ -23,6 +23,11 @@ class TCPConnection {
     bool _rst{false};
     bool _active{false};
 
+    size_t _time{0};
+    size_t _last_segment_time{0};
+
+    void _dump_receiver_info(TCPSegment &seg);
+
   public:
     //! \name "Input" interface for the writer
     //!@{

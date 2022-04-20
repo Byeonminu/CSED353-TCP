@@ -13,6 +13,14 @@ void DUMMY_CODE(Targs &&... /* unused */) {}
 using namespace std;
 
 
+void TCPConnection::receiver(TCPSegment &seg) {
+    if (_receiver.ackno().has_value()) {
+        seg.header().ack = true;
+        seg.header().ackno = _receiver.ackno().value();
+        seg.header().win = _receiver.window_size();
+    }
+}
+
 
 size_t TCPConnection::remaining_outbound_capacity() const { return _sender.stream_in().remaining_capacity(); }
 

@@ -26,6 +26,10 @@ class TCPConnection {
     size_t _time{0};
     size_t _last_segment_time{0};
 
+
+    void receiver(TCPSegment &seg);
+
+
   public:
     //! \name "Input" interface for the writer
     //!@{

@@ -64,7 +64,39 @@ bool TCPConnection::active() const {
     if(_rst == true){
          return false; 
     }
-   
+ 
+    if (_sender.fin_sent()) {
+        return false;
+    }
+    else{
+        return true;
+    }
+
+    if (_sender.fin_acked()) {
+        return false;
+    }
+    else{
+        return true;
+    }
+
+    if (_receiver.stream_out().input_ended()) {
+        return false;
+    }
+    else{
+        return true;
+    }
+    
+    //! Should the TCPConnection stay active (and keep ACKing)
+    //! for 10 * _cfg.rt_timeout milliseconds after both streams have ended,
+    if (_linger_after_streams_finish) {
+        if (time_since_last_segment_received() < 10 * _cfg.rt_timeout) {
+            return true;  // connection closed
+        } else {
+            return false;
+        }
+    } else {
+        return false;  // connection closed
+    }
 }
 
 size_t TCPConnection::write(const string &data) {

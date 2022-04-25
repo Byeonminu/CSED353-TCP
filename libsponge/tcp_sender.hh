@@ -9,65 +9,50 @@
 #include <functional>
 #include <queue>
 
-using namespace std;
 //! \brief The "sender" part of a TCP implementation.
+
+//! Timer for retransmission
+class Timer {
+  private:
+    bool _active{false};
+
+    size_t _start_time{0};
+    size_t _current_time{0};
+    size_t _rto{0};
+
+  public:
+    Timer(unsigned int rto) : _rto(rto) {}
+
+    void update_time(size_t timestamp) { _current_time = timestamp; }
+
+    bool timeout(void) const { return (active() && (_current_time - _start_time >= _rto)); }
+
+    void rto_double(void) { _rto *= 2u; }
+
+    void start(size_t timestamp) {
+        _start_time = _current_time = timestamp;
+        _active = true;
+    }
+
+    bool active(void) const { return _active; }
+
+    void rto_reset(unsigned int rto) {
+        _rto = rto;
+        _active = false;
+    }
+};
 
 //! Accepts a ByteStream, divides it up into segments and sends the
 //! segments, keeps track of which segments are still in-flight,
 //! maintains the Retransmission Timer, and retransmits in-flight
 //! segments if the retransmission timer expires.
-
-class Timer {
-  private:
-    bool is_active;
-
-    
-    size_t setzero_rto;
-    size_t current_rto;
-    size_t current_time;
-   
-    
-  public:
-    Timer(size_t initial_value):
-    is_active(false),
-    setzero_rto(initial_value), 
-    current_rto(initial_value), 
-    current_time(0) {}
-
-    bool tick(size_t time){
-      if (!timer_active()) return false;
-      if (time >= current_rto - current_time) return true;
-      else {
-          current_time += time;
-          return false;
-       }
-    }
-
-    bool timer_active(){ return is_active;}
-
-    void begin(){
-        is_active = true;
-        current_time = 0;
-    }
-    void end(){
-        is_active = false;
-        current_time = 0;
-    }
-    void rto_double(){ current_rto = 2 * current_rto; }
-    void rto_reset(){ current_rto = setzero_rto; }
-
-  
-
-};
-
-
 class TCPSender {
   private:
     //! our initial sequence number, the number for our SYN.
     WrappingInt32 _isn;
 
     //! outbound queue of segments that the TCPSender wants sent
-    queue<TCPSegment> _segments_out{};
+    std::queue<TCPSegment> _segments_out{};
 
     //! retransmission timer for the connection
     unsigned int _initial_retransmission_timeout;
@@ -76,19 +61,24 @@ class TCPSender {
     ByteStream _stream;
 
     //! the (absolute) sequence number for the next byte to be sent
-    uint64_t _next_seqno{0};
+    // uint64_t _next_seqno{0};
 
-    bool check_syn{false};
-    bool check_fin{false};
 
-    queue<TCPSegment> unacked{};
+    
+
+
+    unsigned int _consecutive_retrans_v{0};
+    std::queue<TCPSegment> unacked{};
+
     Timer sendtimer;
 
-    uint16_t win_sizeof_sender{1};
-    size_t _consecutive_retransmissions_v{0};
-    uint64_t bytes_in_flight_v{0};
-   
+    size_t _time{0};
+    uint16_t _window_size{1};
+    uint64_t byte_sent{0};
+    uint64_t byte_received{0};
     
+    bool _eof{false};
+
   public:
     //! Initialize a TCPSender
     TCPSender(const size_t capacity = TCPConfig::DEFAULT_CAPACITY,
@@ -114,7 +104,7 @@ class TCPSender {
     void fill_window();
 
     //! \brief Notifies the TCPSender of the passage of time
-    void tick(const size_t time);
+    void tick(const size_t ms_since_last_tick);
     //!@}
 
     //! \name Accessors
@@ -139,11 +129,14 @@ class TCPSender {
     //!@{
 
     //! \brief absolute seqno for the next byte to be sent
-    uint64_t next_seqno_absolute() const { return _next_seqno; }
+    uint64_t next_seqno_absolute() const { return byte_sent; }
 
     //! \brief relative seqno for the next byte to be sent
-    WrappingInt32 next_seqno() const { return wrap(_next_seqno, _isn); }
+    WrappingInt32 next_seqno() const { return wrap(byte_sent, _isn); }
     //!@}
+
+    bool fin_sent(void) const { return _eof; }
+   bool fin_acked(void) const { return unacked.empty() && fin_sent(); }
 };
 
 #endif  // SPONGE_LIBSPONGE_TCP_SENDER_HH

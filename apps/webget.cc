@@ -1,4 +1,4 @@
-#include "socket.hh"
+#include "tcp_sponge_socket.hh"
 #include "util.hh"
 
 #include <cstdlib>
@@ -19,7 +19,7 @@ void get_URL(const string &host, const string &path) {
 
     // connect to the "http" service on
     Address address(host, "http");
-    TCPSocket tcpsoc;
+    CS144TCPSocket tcpsoc;
 
     tcpsoc.connect(address);
     tcpsoc.write("GET " + path + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" );
@@ -30,7 +30,7 @@ void get_URL(const string &host, const string &path) {
     tcpsoc.shutdown(SHUT_WR); // send buffer 만 차단한다 (더 이상 socket에게 송신할 수 없다)
 
 
-
+    tcpsoc.wait_until_closed();
     // cerr << "Function called: get_URL(" << host << ", " << path << ").\n";
     // cerr << "Warning: get_URL() has not been implemented yet.\n";
 }

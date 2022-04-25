@@ -25,13 +25,13 @@ class TCPConnection {
 
     size_t _time{0};
     size_t _last_segment_time{0};
-
-
-    void receiver(TCPSegment &seg);
-
+    
+    void receiver_info(TCPSegment &seg);
+    void _segment_out(void);
+    void _rst_segment(void);
 
   public:
-    //! \name "Input" interface for the writer
+    //! \name "Inputs" interface for the writer
     //!@{
 
     //! \brief Initiate a connection by sending a SYN segment

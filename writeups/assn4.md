@@ -9,9 +9,11 @@ My student ID (numeric): [20200820]
 
 This assignment took me about [30] hours to do (including the time on studying, designing, and writing the code).
 
+
 If you used any part of best-submission codes, specify all the best-submission numbers that you used (e.g., 1, 2): []
 
 - **Caution**: If you have no idea about above best-submission item, please refer the Assignment PDF for detailed description.
+
 
 Your benchmark results (without reordering, with reordering): [4.43, 1.68]
 

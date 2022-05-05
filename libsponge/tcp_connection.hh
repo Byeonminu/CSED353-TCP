@@ -20,6 +20,7 @@ class TCPConnection {
     //! for 10 * _cfg.rt_timeout milliseconds after both streams have ended,
     //! in case the remote TCPConnection doesn't know we've received its whole stream?
     bool _linger_after_streams_finish{true};
+
     bool _rst{false};
     bool _active{false};
 
@@ -32,6 +33,7 @@ class TCPConnection {
 
   public:
     //! \name "Inputs" interface for the writer
+
     //!@{
 
     //! \brief Initiate a connection by sending a SYN segment
@@ -105,4 +107,6 @@ class TCPConnection {
     //!@}
 };
 
+
 #endif  // SPONGE_LIBSPONGE_TCP_FACTORED_HH
+

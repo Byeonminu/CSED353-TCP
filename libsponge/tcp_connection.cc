@@ -12,6 +12,7 @@ void DUMMY_CODE(Targs &&... /* unused */) {}
 
 using namespace std;
 
+
 size_t TCPConnection::remaining_outbound_capacity() const { return _sender.stream_in().remaining_capacity(); }
 
 size_t TCPConnection::bytes_in_flight() const { return _sender.bytes_in_flight(); }
@@ -102,18 +103,23 @@ void TCPConnection::connect() {
     _segment_out();
 }
 
+
 TCPConnection::~TCPConnection() {
     try {
         if (active()) {
             cerr << "Warning: Unclean shutdown of TCPConnection\n";
 
             // Your code here: need to send a RST segment to the peer
+
             _rst_segment();
+
+
         }
     } catch (const exception &e) {
         std::cerr << "Exception destructing TCP FSM: " << e.what() << std::endl;
     }
 }
+
 
 
 void TCPConnection::receiver_info(TCPSegment &seg) {
@@ -144,3 +150,4 @@ void TCPConnection::_rst_segment(void) {
     _segments_out.push(segment);
     _sender.segments_out().pop();
 }
+

@@ -2,8 +2,7 @@
 
 using namespace std;
 
-<<<<<<< HEAD
-=======
+
 //! \param[in] tap Raw network device that will be owned by the adapter
 //! \param[in] eth_address Ethernet address (local address) of the adapter
 //! \param[in] ip_address IP address (local address) of the adapter
@@ -57,6 +56,6 @@ void TCPOverIPv4OverEthernetAdapter::send_pending() {
     }
 }
 
->>>>>>> origin/lab5-startercode
+
 //! Specialize LossyFdAdapter to TCPOverIPv4OverTunFdAdapter
 template class LossyFdAdapter<TCPOverIPv4OverTunFdAdapter>;

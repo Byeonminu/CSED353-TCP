@@ -7,6 +7,10 @@
 
 #include <optional>
 #include <queue>
+#include <list>
+#include <map>
+
+using namespace std;
 
 //! \brief A "network interface" that connects IP (the internet layer, or network layer)
 //! with Ethernet (the network access layer, or link layer).
@@ -29,6 +33,17 @@
 //! the network interface passes it up the stack. If it's an ARP
 //! request or reply, the network interface processes the frame
 //! and learns or replies as necessary.
+
+struct ARP {
+    size_t arp_addr;
+    uint64_t time_arp;
+};
+
+struct Ethernet {
+    EthernetAddress ethernet_address;
+    uint64_t time_ethernet;
+};
+
 class NetworkInterface {
   private:
     //! Ethernet (known as hardware, network-access-layer, or link-layer) address of the interface
@@ -38,7 +53,13 @@ class NetworkInterface {
     Address _ip_address;
 
     //! outbound queue of Ethernet frames that the NetworkInterface wants sent
-    std::queue<EthernetFrame> _frames_out{};
+    queue<EthernetFrame> _frames_out{};
+
+    list<pair<InternetDatagram, size_t>> unsent{};
+    list<ARP> arp_req{};
+    map <size_t, Ethernet> ip_ethernet_map{};
+
+    uint64_t _time{0};
 
   public:
     //! \brief Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer) addresses

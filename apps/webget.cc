@@ -19,7 +19,7 @@ void get_URL(const string &host, const string &path) {
 
     // connect to the "http" service on
     Address address(host, "http");
-    CS144TCPSocket tcpsoc;
+    FullStackSocket tcpsoc;
 
     tcpsoc.connect(address);
     tcpsoc.write("GET " + path + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" );

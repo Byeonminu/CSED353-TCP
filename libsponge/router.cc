@@ -29,14 +29,51 @@ void Router::add_route(const uint32_t route_prefix,
     cerr << "DEBUG: adding route " << Address::from_ipv4_numeric(route_prefix).ip() << "/" << int(prefix_length)
          << " => " << (next_hop.has_value() ? next_hop->ip() : "(direct)") << " on interface " << interface_num << "\n";
 
-    DUMMY_CODE(route_prefix, prefix_length, next_hop, interface_num);
-    // Your code here.
+    routing_table.push_back(Routingtable(route_prefix, prefix_length, next_hop, interface_num));
+
 }
 
 //! \param[in] dgram The datagram to be routed
 void Router::route_one_datagram(InternetDatagram &dgram) {
-    DUMMY_CODE(dgram);
-    // Your code here.
+
+    
+    size_t size = routing_table.size();
+    int max = -1;
+    size_t longest_prefix_match;
+    size_t _dst = dgram.header().dst;
+    
+    for (size_t i = 0; i < size; i++) {
+        auto object = routing_table[i];
+        size_t postfix_length = 32 - object.prefix_length;
+        size_t prefix;
+        size_t dst_temp;
+        if(object.prefix_length > 0) prefix = object.route_prefix >> postfix_length;
+        else prefix = 0;
+         if(object.prefix_length > 0) dst_temp = _dst >> postfix_length;
+        else dst_temp = 0;
+
+        if (prefix == dst_temp && max < object.prefix_length) {
+            longest_prefix_match = i;
+            max = object.prefix_length;
+        }
+    }
+
+    if (max != -1){ // router matched
+        if (dgram.header().ttl == 0 || (dgram.header().ttl - 1) == 0) { // If the TTL was zero already, or hits zero after the decrement, the router should drop the datagram.
+            return;
+        }
+        auto matched_object = routing_table[longest_prefix_match];
+        if (matched_object.next_hop.has_value()) {
+            Address next_hop_temp = matched_object.next_hop.value();
+            interface(matched_object.interface_num).send_datagram(dgram, next_hop_temp);
+        }
+        else{
+            Address next_hop_temp = Address::from_ipv4_numeric(_dst);
+            interface(matched_object.interface_num).send_datagram(dgram, next_hop_temp);
+        }
+    }
+
+    return;
 }
 
 void Router::route() {

@@ -11,6 +11,19 @@
 //! immediately (from the `recv_frame` method), it stores them for
 //! later retrieval. Otherwise, behaves identically to the underlying
 //! implementation of NetworkInterface.
+
+struct Routingtable {
+    uint32_t route_prefix;
+    uint8_t prefix_length;
+    std::optional<Address> next_hop;
+    size_t interface_num;
+
+    Routingtable(uint32_t _route_prefix,
+                 uint8_t _prefix_length,
+                 std::optional<Address> _next_hop,
+                 size_t _interface_num): route_prefix(_route_prefix), prefix_length(_prefix_length), next_hop(_next_hop), interface_num(_interface_num) {}
+};
+
 class AsyncNetworkInterface : public NetworkInterface {
     std::queue<InternetDatagram> _datagrams_out{};
 
@@ -42,8 +55,9 @@ class AsyncNetworkInterface : public NetworkInterface {
 //! performs longest-prefix-match routing between them.
 class Router {
     //! The router's collection of network interfaces
+    std::vector<Routingtable> routing_table{};
     std::vector<AsyncNetworkInterface> _interfaces{};
-
+    
     //! Send a single datagram from the appropriate outbound interface to the next hop,
     //! as specified by the route with the longest prefix_length that matches the
     //! datagram's destination address.

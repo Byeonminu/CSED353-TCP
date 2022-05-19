@@ -1,26 +1,33 @@
 Assignment 6 Writeup
 =============
 
-My name: [your name here]
+My name: [Byeon minwoo]
 
-My POVIS ID: [your povis id here]
+My POVIS ID: [minwoobyeon]
 
-My student ID (numeric): [your student id here]
+My student ID (numeric): [20200820]
 
-This assignment took me about [n] hours to do (including the time on studying, designing, and writing the code).
+This assignment took me about [4] hours to do (including the time on studying, designing, and writing the code).
 
 If you used any part of best-submission codes, specify all the best-submission numbers that you used (e.g., 1, 2): []
 
 - **Caution**: If you have no idea about above best-submission item, please refer the Assignment PDF for detailed description.
 
 Program Structure and Design of the Router:
-[]
+[
+    I made new struct for Routingtable.
+    and Routingtable contains route_prefix, prefix_length, next_hop, interface_num member.
+]
 
 Implementation Challenges:
-[]
+[
+    
+]
 
 Remaining Bugs:
-[]
+[
+    33 - router_test (Failed)
+]
 
 - Optional: I had unexpected difficulty with: [describe]
 
